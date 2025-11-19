@@ -64,7 +64,7 @@
 //   await app.listen(process.env.PORT ?? 3005);
 // }
 // bootstrap();
-
+// product-service/src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Transport } from '@nestjs/microservices';
@@ -76,6 +76,17 @@ async function bootstrap() {
     
     const app = await NestFactory.create(AppModule);
     console.log('✅ NestFactory.create completed');
+    
+    // ✅ ENABLE CORS
+    app.enableCors({
+      origin: [
+        'http://localhost:5173',
+        'http://localhost:3000',
+      ],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    });
     
     const configService = app.get(ConfigService);
     
@@ -96,7 +107,7 @@ async function bootstrap() {
     await app.startAllMicroservices();
     console.log('✅ Microservices started');
     
-    const httpPort = configService.get<number>('PORT') || 3006; // ✅ Provide default
+    const httpPort = configService.get<number>('PORT') || 3006;
     console.log(`🌐 Starting HTTP server on port ${httpPort}...`);
     await app.listen(httpPort);
 
